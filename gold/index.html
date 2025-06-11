@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>黄金投资年化收益率计算器</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #e6b800;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="date"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #e6b800;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #d9a700;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            display: none;
+        }
+        .result h2 {
+            margin-top: 0;
+            color: #e6b800;
+            font-size: 18px;
+        }
+        .result p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        .error {
+            color: #d9534f;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>黄金投资年化收益率计算器</h1>
+        
+        <div class="form-group">
+            <label for="purchaseDate">购买日期：</label>
+            <input type="date" id="purchaseDate" required>
+            <div class="error" id="purchaseDateError">请选择购买日期</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="todayDate">今日日期：</label>
+            <input type="date" id="todayDate" required>
+            <div class="error" id="todayDateError">请选择今日日期</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="returnRate">收益率（%）：</label>
+            <input type="number" id="returnRate" step="0.01" placeholder="例如：5.5" required>
+            <div class="error" id="returnRateError">请输入收益率</div>
+        </div>
+        
+        <button id="calculateBtn">计算年化收益率</button>
+        
+        <div class="result" id="result">
+            <h2>计算结果</h2>
+            <p>投资天数：<span id="daysInvested"></span> 天</p>
+            <p>年化收益率：<span id="annualizedRate"></span>%</p>
+            <p id="rateDescription"></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 设置今日日期为默认值
+            const today = new Date();
+            const formattedDate = today.toISOString().split('T')[0];
+            document.getElementById('todayDate').value = formattedDate;
+            
+            // 计算按钮点击事件
+            document.getElementById('calculateBtn').addEventListener('click', function() {
+                // 获取输入值
+                const purchaseDate = document.getElementById('purchaseDate').value;
+                const todayDate = document.getElementById('todayDate').value;
+                const returnRate = document.getElementById('returnRate').value;
+                
+                // 验证输入
+                let isValid = true;
+                
+                if (!purchaseDate) {
+                    document.getElementById('purchaseDateError').style.display = 'block';
+                    isValid = false;
+                } else {
+                    document.getElementById('purchaseDateError').style.display = 'none';
+                }
+                
+                if (!todayDate) {
+                    document.getElementById('todayDateError').style.display = 'block';
+                    isValid = false;
+                } else {
+                    document.getElementById('todayDateError').style.display = 'none';
+                }
+                
+                if (!returnRate || isNaN(returnRate) || returnRate === '') {
+                    document.getElementById('returnRateError').style.display = 'block';
+                    isValid = false;
+                } else {
+                    document.getElementById('returnRateError').style.display = 'none';
+                }
+                
+                if (!isValid) return;
+                
+                // 计算投资天数
+                const startDate = new Date(purchaseDate);
+                const endDate = new Date(todayDate);
+                
+                // 验证日期顺序
+                if (endDate < startDate) {
+                    alert('今日日期不能早于购买日期！');
+                    return;
+                }
+                
+                const timeDiff = endDate - startDate;
+                const daysInvested = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+                
+                // 计算年化收益率
+                const returnRateDecimal = parseFloat(returnRate) / 100;
+                const annualizedRate = (Math.pow(1 + returnRateDecimal, 365 / daysInvested) - 1) * 100;
+                
+                // 显示结果
+                document.getElementById('daysInvested').textContent = daysInvested;
+                document.getElementById('annualizedRate').textContent = annualizedRate.toFixed(2);
+                
+                // 根据收益率给出评价
+                let description = '';
+                if (annualizedRate >= 20) {
+                    description = '非常高的收益率！';
+                } else if (annualizedRate >= 10) {
+                    description = '较高的收益率。';
+                } else if (annualizedRate >= 5) {
+                    description = '良好的收益率。';
+                } else if (annualizedRate >= 0) {
+                    description = '一般收益率。';
+                } else {
+                    description = '收益率低于零，投资亏损。';
+                }
+                document.getElementById('rateDescription').textContent = description;
+                
+                // 显示结果区域
+                document.getElementById('result').style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>
