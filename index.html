@@ -2,6 +2,8 @@
 <html>
 <head>
     <title>翻页时钟</title>
+    <!-- 添加视口元标签，确保页面在移动设备上正确显示 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -47,6 +49,52 @@
             margin-top: 20px;
             white-space: pre-wrap;
         }
+        .text-links {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            text-align: center;
+        }
+        .text-links a {
+            text-decoration: none;
+            color: #007BFF;
+            display: block;
+            margin: 10px 0;
+            transition: color 0.3s ease;
+        }
+        .text-links a:hover {
+            color: #0056b3;
+        }
+
+        /* 针对平板设备的样式调整 */
+        @media (max-width: 1024px) {
+            body {
+                margin: 15px;
+                padding: 15px;
+            }
+            .image-container img {
+                width: 200px;
+            }
+        }
+
+        /* 针对手机设备的样式调整 */
+        @media (max-width: 768px) {
+            body {
+                margin: 10px;
+                padding: 10px;
+            }
+            .image-container {
+                gap: 15px;
+            }
+            .image-container img {
+                width: 150px;
+            }
+            .info, .file-tree, .text-links {
+                padding: 15px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -58,31 +106,13 @@
         <p><a href='./clock4/index.html'><img src="./pic/clock4.webp"/></a></p>
         <p><a href='./clock5/index.html'><img src="./pic/clock5.webp"/></a></p>
         <p><a href='./clock6/index.html'><img src="./pic/clock6.webp"/></a></p>
-        <p><a href='./gold/index.html'>黄金年化率计算</a></p>
+    </div>
+    <div class="text-links">
+        <a href='./goldnianhualv/index.html'>黄金年化率计算</a>
+        <a href='./goldnianhualv/index.html'>黄金补仓计算</a>
     </div>
     <div class="info">
         <p>一个简单的html，Just for myself。<br>电脑打开，移动设备没适配<br>下一步css</p>
-    </div>
-    <div class="file-tree">
-        当前文件夹文件树：<br>
-        ├── index.html<br>
-        ├── pic/<br>
-        │   ├── clock1.webp<br>
-        │   ├── clock2.webp<br>
-        │   ├── clock3.webp<br>
-        │   ├── clock4.webp<br>
-        │   ├── clock5.webp<br>
-        │   └── clock6.webp<br>
-        ├── clock1/<br>
-        │   └── index.html<br>
-        ├── clock2/<br>
-        │   └── index.html<br>
-        ├── clock4/<br>
-        │   └── index.html<br>
-        ├── clock5/<br>
-        │   └── index.html<br>
-        └── clock6/<br>
-            └── index.html<br>
     </div>
 </body>
 </html>

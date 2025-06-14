@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>黄金补仓成本计算</title>
+    <!-- 添加视口元标签，确保页面在移动设备上正确显示 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 20px;
+            padding: 20px;
+        }
+        h1 {
+            color: #007BFF;
+            text-align: center;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            max-width: 500px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>黄金补仓成本计算</h1>
+    <form id="calculationForm">
+        <label for="costPrice">成本金价（元/克）：</label>
+        <input type="number" id="costPrice" step="0.01" required>
+        <!-- 修改标签文本为持有金额 -->
+        <label for="holdingAmount">持有金额（元）：</label>
+        <input type="number" id="holdingAmount" step="0.01" required>
+        <label for="todayPrice">今日金价（元/克）：</label>
+        <input type="number" id="todayPrice" step="0.01" required>
+        <label for="replenishAmount">补仓金额（元）：</label>
+        <input type="number" id="replenishAmount" step="0.01" required>
+        <button type="submit">计算</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        const form = document.getElementById('calculationForm');
+        const resultDiv = document.getElementById('result');
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const costPrice = parseFloat(document.getElementById('costPrice').value);
+            const holdingAmount = parseFloat(document.getElementById('holdingAmount').value);
+            const todayPrice = parseFloat(document.getElementById('todayPrice').value);
+            const replenishAmount = parseFloat(document.getElementById('replenishAmount').value);
+
+            // 计算原本持有的克数
+            const originalHoldingAmount = holdingAmount / costPrice;
+            // 计算补仓后的克数
+            const newHoldingAmount = originalHoldingAmount + (replenishAmount / todayPrice);
+            // 计算总成本
+            const totalCost = holdingAmount + replenishAmount;
+            // 计算新的成本金价
+            const newCostPrice = totalCost / newHoldingAmount;
+
+            // 构建计算过程文本
+            const calculationProcess = `
+            计算过程：
+            1. 原本持有的克数 = 持有金额 / 成本金价 = ${holdingAmount} / ${costPrice} = ${originalHoldingAmount.toFixed(2)} 克
+            2. 补仓的克数 = 补仓金额 / 今日金价 = ${replenishAmount} / ${todayPrice} = ${(replenishAmount / todayPrice).toFixed(2)} 克
+            3. 补仓后的总克数 = 原本持有的克数 + 补仓的克数 = ${originalHoldingAmount.toFixed(2)} + ${(replenishAmount / todayPrice).toFixed(2)} = ${newHoldingAmount.toFixed(2)} 克
+            4. 总成本 = 持有金额 + 补仓金额 = ${holdingAmount} + ${replenishAmount} = ${totalCost.toFixed(2)} 元
+            5. 新的成本金价 = 总成本 / 补仓后的总克数 = ${totalCost.toFixed(2)} / ${newHoldingAmount.toFixed(2)} = ${newCostPrice.toFixed(2)} 元/克
+            `;
+
+            resultDiv.textContent = `补仓后的成本金价为：${newCostPrice.toFixed(2)} 元/克\n${calculationProcess}`;
+        });
+    </script>
+</body>
+</html>
