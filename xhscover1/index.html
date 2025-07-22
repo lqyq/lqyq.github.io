@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小学生学习卡片生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "SimHei", "WenQuanYi Micro Hei", "Heiti TC", sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 5px solid #FFA500;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            background-color: #FFF8DC;
+            padding: 20px;
+            border-radius: 15px;
+            border: 3px dashed #FFA500;
+        }
+        
+        .header h1 {
+            color: #FF4500;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.8);
+        }
+        
+        .header p {
+            color: #4169E1;
+            font-size: 1.2em;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 40px;
+            align-items: start;
+        }
+        
+        .form-section {
+            background: #F0F8FF;
+            padding: 30px;
+            border-radius: 15px;
+            border: 3px dotted #4169E1;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #228B22;
+            font-size: 1.1em;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 3px solid #98FB98;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #FF69B4;
+            box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.2);
+        }
+        
+        .form-group textarea {
+            height: 80px;
+            resize: vertical;
+        }
+        
+        .color-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .color-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .color-input input[type="color"] {
+            width: 40px;
+            height: 40px;
+            border: 3px solid white;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 0 2px #ddd;
+        }
+        
+        .template-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .template-option {
+            padding: 15px;
+            border: 3px solid #e9ecef;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .template-option:hover,
+        .template-option.selected {
+            border-color: #FF69B4;
+            background: #FFF0F5;
+        }
+        
+        .generate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #FF4500, #FF69B4);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 69, 0, 0.3);
+        }
+        
+        .preview-section {
+            position: sticky;
+            top: 20px;
+        }
+        
+        .preview-container {
+            background: #fff;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 5px solid #4169E1;
+        }
+        
+        .cover-preview {
+            width: 400px;
+            height: 500px;
+            position: relative;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #4169E1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+        
+        .cover-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.7);
+        }
+        
+        .brand-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+            background: #FF69B4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 18px;
+        }
+        
+        .brand-name {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .read-indicator {
+            font-size: 14px;
+            background-color: #4169E1;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+        
+        .main-title {
+			display: inline-block; /* block或 inline-block */
+			margin-bottom: 5px;
+            padding: 20px;
+            font-size: 48px;
+            font-weight: bold;
+            line-height: 1.3;
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+			flex-direction:column;
+        }
+        
+        .subtitle {
+            padding: 0 20px 10px;
+            text-align: center;
+            font-size: 18px;
+            color: #4169E1;
+            font-weight: bold;
+        }
+        
+        .visual-content {
+            flex: 0.7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.5);
+            margin: 0 20px;
+            border-radius: 15px;
+        }
+        
+        .visual-placeholder {
+            text-align: center;
+            font-size: 16px;
+        }
+        
+        .download-section {
+            padding: 20px;
+            text-align: center;
+            background: #FFF8DC;
+        }
+        
+        .download-btn {
+            background: #228B22;
+            color: white;
+            border: 3px solid #32CD32;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .download-btn:hover {
+            background: #32CD32;
+            transform: translateY(-1px);
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .cover-preview {
+                width: 100%;
+                max-width: 400px;
+                margin: 0 auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>小学生学习卡片生成器 ✨</h1>
+            <p>轻松制作有趣又有用的学习卡片！</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="form-section">
+                <div class="form-group">
+                    <label>班级/姓名 🏫</label>
+                    <input type="text" id="brandName" placeholder="请输入班级或姓名" value="小乐老师">
+                </div>
+                
+                <div class="form-group">
+                    <label>主标题 📖</label>
+                    <textarea id="mainTitle" placeholder="用英文逗号分隔的主标题" value="乘法口诀表背诵小技巧,每天练习5分钟,数学成绩大提升"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>副标题 💡</label>
+                    <textarea id="subtitle" placeholder="用英文逗号分隔的副标题" value="乘法口诀,数学基础,快速记忆"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>图片类型 🖼️</label>
+                    <select id="visualType">
+                        <option value="comparison">对比图</option>
+                        <option value="process">步骤图</option>
+                        <option value="chart">表格图</option>
+                        <option value="illustration">插画</option>
+                        <option value="timeline">时间线</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>卡片颜色 🎨</label>
+                    <div class="color-inputs">
+                        <div class="color-input">
+                            <input type="color" id="primaryColor" value="#FFD700">
+                            <span>主颜色</span>
+                        </div>
+                        <div class="color-input">
+                            <input type="color" id="secondaryColor" value="#FFA500">
+                            <span>次颜色</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>主标题第一个逗号前颜色 🎨</label>
+                    <div class="color-input">
+                        <input type="color" id="titleFirstPartColor" value="#FF4500">
+                        <span>标题首部分颜色</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>卡片风格 📇</label>
+                    <div class="template-selector">
+                        <div class="template-option selected" data-template="modern">
+                            <div>🌈</div>
+                            <div>彩虹风格</div>
+                        </div>
+                        <div class="template-option" data-template="gradient">
+                            <div>🐼</div>
+                            <div>动物风格</div>
+                        </div>
+                        <div class="template-option" data-template="minimal">
+                            <div>📚</div>
+                            <div>书本风格</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="generate-btn" onclick="generateCover()">
+                    🎯 生成学习卡片
+                </button>
+            </div>
+            
+            <div class="preview-section">
+                <div class="preview-container">
+                    <div class="cover-preview" id="coverPreview">
+                        <div class="cover-header">
+                            <div class="brand-info">
+                                <div class="brand-logo" id="brandLogo">小乐</div>
+                                <div class="brand-name" id="previewBrandName">小乐老师</div>
+                            </div>
+                            <div class="read-indicator">好好学习 ↓</div>
+                        </div>
+                        
+                        <div class="main-title" id="previewTitle">乘法口诀表背诵小技巧</div>
+                        
+                        <div class="subtitle" id="previewSubtitle">乘法口诀,数学基础,快速记忆</div>
+                        
+                        <div class="visual-content">
+                            <div class="visual-placeholder" id="visualContent">
+                                <div style="font-size: 48px; margin-bottom: 10px;">🎯</div>
+                                <div>知识小助手</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="download-section">
+                        <button class="download-btn" onclick="downloadCover()">
+                            📥 下载学习卡片
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入html2canvas库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <script>
+        let currentTemplate = 'modern';
+        
+        // 实时预览更新
+        document.getElementById('brandName').addEventListener('input', updatePreview);
+        document.getElementById('mainTitle').addEventListener('input', updatePreview);
+        document.getElementById('subtitle').addEventListener('input', updatePreview);
+        document.getElementById('primaryColor').addEventListener('change', updateColors);
+        document.getElementById('secondaryColor').addEventListener('change', updateColors);
+        document.getElementById('visualType').addEventListener('change', updateVisual);
+        document.getElementById('titleFirstPartColor').addEventListener('change', updatePreview);
+
+        
+        // 模板选择
+        document.querySelectorAll('.template-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.template-option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                currentTemplate = this.dataset.template;
+                updateTemplate();
+            });
+        });
+		
+		function updatePreview() {
+			// 获取品牌名称（假设存在一个id为brandName的输入框）
+			const brandName = document.getElementById('brandName').value || '品牌名称';
+			
+			// 获取主标题和颜色设置
+			const mainTitle = document.getElementById('mainTitle').value || '请输入主标题';
+			const titleFirstPartColor = document.getElementById('titleFirstPartColor').value;
+			
+			// 更新品牌名称预览
+			document.getElementById('previewBrandName').textContent = brandName;
+			
+			// 更新品牌Logo预览（取品牌名称前两个字符并大写）
+			document.getElementById('brandLogo').textContent = brandName.substring(0, 2).toUpperCase();
+			
+			// 处理主标题中的逗号分隔
+			const commaIndex = mainTitle.indexOf(',');
+			let titleText;
+			
+			if (commaIndex !== -1) {
+				// 第一部分文本（逗号前），将其中的逗号也替换为<br>
+				const firstPart = mainTitle.slice(0, commaIndex).replace(/,/g, '<br>');
+				// 剩余部分文本（逗号后），同样处理其中的逗号
+				const restPart = mainTitle.slice(commaIndex + 1).replace(/,/g, '<br>');
+				// 应用颜色，但不在两部分之间强制换行
+				titleText = `<span style="color: ${titleFirstPartColor}">${firstPart}</span>${restPart}`;
+			} else {
+				// 没有逗号时，直接替换所有逗号为换行
+				titleText = mainTitle.replace(/,/g, '<br>');
+			}
+			
+			// 更新主标题预览区域
+			document.getElementById('previewTitle').innerHTML = titleText;
+			
+			// 获取副标题并处理其中的逗号分隔换行
+			const subtitle = document.getElementById('subtitle').value || '';
+			const subtitleText = subtitle.replace(/,/g, '<br>');
+			
+			// 更新副标题预览区域
+			document.getElementById('previewSubtitle').innerHTML = subtitleText;
+		}
+        
+        function updateColors() {
+            const primaryColor = document.getElementById('primaryColor').value;
+            const secondaryColor = document.getElementById('secondaryColor').value;
+            const preview = document.getElementById('coverPreview');
+            
+            preview.style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`;
+        }
+        
+        function updateVisual() {
+            const visualType = document.getElementById('visualType').value;
+            const visualContent = document.getElementById('visualContent');
+            
+            const visuals = {
+                comparison: '<div style="font-size: 48px; margin-bottom: 10px;">🐇 ↔️ 🐢</div><div>快与慢对比</div>',
+                process: '<div style="font-size: 48px; margin-bottom: 10px;">📖 → ✏️ → 📝</div><div>学习三步骤</div>',
+                chart: '<div style="font-size: 48px; margin-bottom: 10px;">📊</div><div>数据小图表</div>',
+                illustration: '<div style="font-size: 48px; margin-bottom: 10px;">🎨</div><div>知识小插画</div>',
+                timeline: '<div style="font-size: 48px; margin-bottom: 10px;">⏰</div><div>时间轴规划</div>'
+            };
+            
+            visualContent.innerHTML = visuals[visualType] || visuals.comparison;
+        }
+        
+        function updateTemplate() {
+            const preview = document.getElementById('coverPreview');
+            const primaryColor = document.getElementById('primaryColor').value;
+            const secondaryColor = document.getElementById('secondaryColor').value;
+            
+            switch(currentTemplate) {
+                case 'modern':
+                    preview.style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`;
+                    break;
+                case 'gradient':
+                    preview.style.background = `linear-gradient(45deg, ${primaryColor}, ${secondaryColor}, #FFB6C1, #87CEEB)`;
+                    break;
+                case 'minimal':
+                    preview.style.background = `linear-gradient(180deg, #F0F8FF 0%, #E6E6FA 100%)`;
+                    preview.style.color = '#4169E1';
+                    break;
+            }
+        }
+        
+        function generateCover() {
+            updatePreview();
+            updateColors();
+            updateVisual();
+            
+            // 添加生成动画效果
+            const preview = document.getElementById('coverPreview');
+            preview.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                preview.style.transform = 'scale(1)';
+            }, 300);
+            
+            // 显示成功提示
+            showNotification('✅ 学习卡片生成成功！', 'success');
+        }
+        
+        async function downloadCover() {
+            const preview = document.getElementById('coverPreview');
+            const downloadBtn = document.querySelector('.download-btn');
+            
+            // 更新按钮状态
+            downloadBtn.textContent = '🔄 生成中...';
+            downloadBtn.disabled = true;
+            
+            try {
+                // 获取预览区域的精确尺寸
+                const rect = preview.getBoundingClientRect();
+                
+                // 使用更精确的配置参数
+                const canvas = await html2canvas(preview, {
+                    width: rect.width,  // 使用实际宽度
+                    height: rect.height, // 使用实际高度
+                    scale: 2, // 提高清晰度
+                    useCORS: true,
+                    logging: false,
+                    letterRendering: true,
+                    allowTaint: false,
+                    removeContainer: true
+                });
+                
+                // 创建下载链接
+                const link = document.createElement('a');
+                link.download = `学习卡片_${new Date().getTime()}.png`;
+                link.href = canvas.toDataURL('image/png');
+                
+                // 触发下载
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showNotification('🎉 图片下载成功！', 'success');
+                
+            } catch (error) {
+                console.error('下载失败:', error);
+                showNotification('❌ 下载失败，请重试', 'error');
+            } finally {
+                // 恢复按钮状态
+                downloadBtn.textContent = '📥 下载学习卡片';
+                downloadBtn.disabled = false;
+            }
+        }
+        
+        function showNotification(message, type = 'info') {
+            // 创建通知元素
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 600;
+                z-index: 10000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            `;
+            
+            // 设置颜色
+            const colors = {
+                success: '#228B22',
+                error: '#FF4500',
+                info: '#4169E1'
+            };
+            notification.style.backgroundColor = colors[type] || colors.info;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // 显示动画
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // 自动消失
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+        
+        // 添加键盘快捷键
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 's':
+                        e.preventDefault();
+                        downloadCover();
+                        break;
+                    case 'Enter':
+                        e.preventDefault();
+                        generateCover();
+                        break;
+                }
+            }
+        });
+        
+        // 初始化
+        updatePreview();
+        
+        // 添加使用提示
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                showNotification('💡 快捷键：Ctrl+S 下载，Ctrl+Enter 生成', 'info');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
